@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Basics Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="css">
+:root {
+  /* Layout: single phone-first column; summary bar, then week cards with tappable rows */
+  --bg: #f3f4f7;
+  --surface: #ffffff;
+  --ink: #18202e;
+  --muted: #5c6577;
+  --line: #dde1e9;
+  --accent: #2f5bd3;
+  --accent-soft: #e6ecfb;
+  --done: #1f8a5b;
+  --done-soft: #e3f3eb;
+  --key: #b45309;
+  --key-soft: #fdf0dc;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151d; --surface: #1a2030; --ink: #e8ecf4; --muted: #9aa3b5; --line: #2a3246;
+    --accent: #7b9cf5; --accent-soft: #1f2a47; --done: #4cc38a; --done-soft: #16302a;
+    --key: #f0a64a; --key-soft: #36281a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151d; --surface: #1a2030; --ink: #e8ecf4; --muted: #9aa3b5; --line: #2a3246;
+  --accent: #7b9cf5; --accent-soft: #1f2a47; --done: #4cc38a; --done-soft: #16302a;
+  --key: #f0a64a; --key-soft: #36281a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.45; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-size: 1.6rem; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 1.05rem; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 0; font-size: 0.95rem; }
+.summary { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.big { display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.big strong { font-size: 2rem; line-height: 1; }
+.big span { color: var(--muted); }
+.bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .25s; }
+.bar.done > i { background: var(--done); }
+.method { font-size: 0.9rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+.method b { color: var(--ink); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { font-size: 0.85rem; color: var(--accent); background: var(--accent-soft); padding: 6px 10px; border-radius: 8px; text-decoration: none; font-weight: 500; }
+.links a:focus-visible, .row:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.week { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.week-head { padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--line); }
+.week-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.week-label { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.count { font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+.count.full { color: var(--done); font-weight: 600; }
+.week-note { font-size: 0.88rem; color: var(--muted); margin: 0; }
+ul { list-style: none; margin: 0; padding: 0; }
+.row { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--line); cursor: pointer; user-select: none; }
+li:last-child .row { border-bottom: 0; }
+.row:hover { background: var(--accent-soft); }
+.box { flex: 0 0 22px; height: 22px; border: 2px solid var(--muted); border-radius: 6px; display: grid; place-items: center; margin-top: 1px; }
+.row.is-done .box { background: var(--done); border-color: var(--done); }
+.box svg { width: 14px; height: 14px; opacity: 0; }
+.row.is-done .box svg { opacity: 1; }
+.txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.title-line { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.title { font-weight: 500; }
+.row.is-done .title { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.src { font-family: var(--font-mono); font-size: 0.68rem; padding: 2px 6px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); }
+.src.you { background: var(--done-soft); color: var(--done); }
+.pill-key { font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--key-soft); color: var(--key); }
+.tag { font-size: 0.85rem; color: var(--muted); }
+.pill-must { font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--done-soft); color: var(--done); }
+.pill-later { font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--line); color: var(--muted); }
+.week.optional { border-style: dashed; }
+.week.optional .title { color: var(--muted); }
+.when { font-size: 0.75rem; color: var(--done); font-variant-numeric: tabular-nums; }
+.foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
+.foot button { font: inherit; font-size: 0.82rem; background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+.status { min-height: 1.2em; }
+.confirm { display: none; gap: 8px; align-items: center; }
+.confirm.on { display: flex; }
+.confirm button.danger { color: #c2410c; border-color: #c2410c; }
+@media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script type="application/json" id="state">{"done":{}}</script>
+<script id="app">
+(function () {
+  var WEEKS = [
+    { id: "w0", label: "Before you start", title: "Set up now",
+      note: "Create your accounts and repo before you start Step 1.",
+      items: [
+        ["w0d", "SB", "Create a free AWS Skill Builder account and enrol in both Must plans", "Use the same account as your re/Start training if you have one"],
+        ["w0b", "THM", "Create a free TryHackMe account and enrol in Pre Security", "Free tier is enough to start"],
+        ["w0c", "You", "Create public repo rmctech-ai/aws-security-journey", "README plus one notes file per course"]
+      ] },
+    { id: "exam", label: "Step 1 · CLF-C02 · 3rd week of December", title: "Pass the Cloud Practitioner exam",
+      note: "Your first AWS certification and your focus until exam day.",
+      items: [
+        ["exb", "You", "Book the exam as soon as the re/Start voucher arrives", "Aim for the 3rd week of December"],
+        ["w0a", "You", "Pass CLF-C02", "Shared responsibility, IAM, KMS, CloudTrail, GuardDuty, Shield, WAF"]
+      ] },
+    { id: "sb", label: "Step 2 · AWS Skill Builder (free) · right after the exam", title: "Must-have cloud security, in this order",
+      note: "Full days, 8–12 hours. Badge must be issued before the Jan 15 job caravan. If a lab is locked on the free tier, skip it.",
+      items: [
+        ["sba", "SB", "1st: Security Learning Plan: Identity & Access Management", "4h 10m · day 1 after your exam", "must"],
+        ["sbb", "SB", "2nd: AWS Security Champion – Knowledge Badge Readiness Path", "26h 15m · about 3 full days", "must"],
+        ["sbc", "SB", "Pass the Security Champion Badge Assessment", "1h 30m · take it by Dec 27 at the latest · need 80%+ · retake after 24 hours"],
+        ["sbd", "You", "Add the Credly badge to your resume and LinkedIn", "5–7 business days, slower over the holidays · expect it by about Jan 8"]
+      ] },
+    { id: "w1", label: "Step 3 · Week 1", title: "Networks and encryption",
+      note: "Start after your badge assessment. TryHackMe sections first, then one Hacksplaining lesson a day.",
+      items: [
+        ["w1a", "THM", "Introduction to Cyber Security", "Offensive vs defensive, careers"],
+        ["w1b", "THM", "Network Fundamentals", "Behind security groups, NACLs, VPCs"],
+        ["w1c", "THM", "How The Web Works", "DNS, HTTP, HTTPS"],
+        ["w1d", "HS", "Unencrypted Communication", "AWS: ACM certificates, HTTPS-only"],
+        ["w1e", "HS", "Downgrade Attacks", "AWS: TLS policies on ALB and CloudFront"],
+        ["w1f", "HS", "SSL Stripping", "Force HTTPS everywhere (HSTS)"],
+        ["w1g", "HS", "DNS Poisoning", "AWS: Route 53, DNSSEC"],
+        ["w1h", "HS", "Denial of Service Attacks", "AWS: Shield, WAF rate limiting"],
+        ["w1i", "You", "Push week 1 notes to GitHub", "Attack / Defense / In my world"]
+      ] },
+    { id: "w2", label: "Step 3 · Week 2", title: "Identity and access",
+      note: "Builds on your IAM plan from Step 1, now from the attacker's side.",
+      items: [
+        ["w2a", "THM", "Computer Fundamentals", "Users, groups, permissions"],
+        ["w2b", "THM", "Software Basics", "Processes, services, Linux and Windows"],
+        ["w2c", "HS", "Broken Access Control", "IAM policies, Supabase Row Level Security"],
+        ["w2d", "HS", "Privilege Escalation", "Why \"Action\": \"*\" is dangerous; least privilege", true],
+        ["w2e", "HS", "Password Mismanagement", "Hashing, MFA, Secrets Manager"],
+        ["w2f", "HS", "Weak Session IDs", "Tokens and JWTs in your APIs"],
+        ["w2g", "HS", "Session Fixation", "New session ID after every login"],
+        ["w2h", "HS", "User Enumeration", "Generic login error messages"],
+        ["w2i", "You", "Push week 2 notes to GitHub", "Attack / Defense / In my world"]
+      ] },
+    { id: "w3", label: "Step 3 · Week 3", title: "Injection and APIs",
+      note: "Apply each lesson to FastAPI, Supabase and n8n.",
+      items: [
+        ["w3a", "THM", "Attacks and Defenses", "Finish the Pre Security path"],
+        ["w3b", "THM", "Claim the Pre Security certificate", "Add to resume and LinkedIn"],
+        ["w3c", "HS", "SQL Injection", "Parameterized queries in FastAPI and Supabase"],
+        ["w3d", "HS", "Cross-Site Scripting", "The most famous web attack"],
+        ["w3e", "HS", "Command Execution", "n8n Execute Command node, Python subprocess"],
+        ["w3f", "HS", "Cross-Origin Resource Sharing", "Your FastAPI CORS settings"],
+        ["w3g", "HS", "Mass Assignment", "Pydantic models that allow only known fields"],
+        ["w3h", "HS", "Server-Side Request Forgery", "EC2 metadata credential theft, why IMDSv2 exists", true],
+        ["w3i", "You", "Push week 3 notes to GitHub", "Attack / Defense / In my world"]
+      ] },
+    { id: "w4", label: "Step 3 · Week 4", title: "Operations and AI security",
+      note: "Few cloud beginners can talk about LLM security. You build with Claude, so you can.",
+      items: [
+        ["w4a", "HS", "Lax Security Settings", "AWS Config, public S3 buckets"],
+        ["w4b", "HS", "Information Leakage", "Error pages and headers that reveal your stack"],
+        ["w4c", "HS", "Logging and Monitoring", "CloudTrail, CloudWatch, GuardDuty"],
+        ["w4d", "HS", "Toxic Dependencies", "pip and npm packages, Dependabot"],
+        ["w4e", "HS", "Prompt Injection in LLM Apps", "Your Claude and n8n AI workflows", true],
+        ["w4f", "HS", "Sensitive Information Disclosure in LLMs", "What your prompts and logs expose"],
+        ["w4g", "HS", "Slopsquatting (LLM Supply Chain)", "Check that AI-suggested packages really exist"],
+        ["w4h", "You", "Push week 4 notes to GitHub", "Attack / Defense / In my world"]
+      ] },
+    { id: "w5", label: "Finish line", title: "Beginner level reached",
+      note: "Then turn the knowledge into a project you can show.",
+      items: [
+        ["w5a", "You", "Explain the 5-phases defense table out loud", "Recon, scanning, access, persistence, covering tracks"],
+        ["w5b", "You", "Explain the OWASP Top 10 basics in your own words", "Use your GitHub notes"],
+        ["w5c", "You", "Start the Secure AWS Account Baseline project", "Root MFA, least-privilege IAM, CloudTrail, budget alert"]
+      ] },
+    { id: "later", label: "Later", title: "After you land a cloud role", optional: true,
+      note: "Advanced plans, flagged for later. Not counted in your progress.",
+      items: [
+        ["la", "SB", "Infrastructure Security Learning Plan", "10h 42m · Advanced · networking, compute, Systems Manager patching", "later"],
+        ["lb", "SB", "Security Learning Plan: Compliance", "14h 30m · Advanced · the GRC engineering path", "later"]
+      ] }
+  ];
+
+  var stateEl = document.getElementById("state");
+  var state;
+  try { state = JSON.parse(stateEl.textContent); } catch (e) { state = { done: {} }; }
+  if (!state.done) state.done = {};
+
+  var LS_KEY = "sec-tracker-local";
+  var artifactApi = null;
+  var useLocal = false;
+  var pending = null;
+  var statusText = "Loading save…";
+  var confirmOn = false;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function fmtDate(iso) { var d = new Date(iso); return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
+
+  var check = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+
+  function render() {
+    var total = 0, done = 0;
+    WEEKS.forEach(function (w) { if (w.optional) return; w.items.forEach(function (it) { total++; if (state.done[it[0]]) done++; }); });
+    var pct = Math.round(done / total * 100);
+    var html = '<header><h1>Security Basics Tracker</h1><p class="sub">TryHackMe Pre Security, 24 Hacksplaining lessons and AWS Skill Builder security plans</p></header>';
+    html += '<section class="summary" aria-label="Overall progress"><div class="big"><strong>' + pct + '%</strong><span>' + done + ' of ' + total + ' done</span></div>';
+    html += '<div class="bar' + (done === total ? ' done' : '') + '"><i style="width:' + pct + '%"></i></div>';
+    html += '<div class="links"><a href="https://tryhackme.com/path/outline/presecurity">TryHackMe Pre Security</a><a href="https://www.hacksplaining.com/app/lessons">Hacksplaining lessons</a><a href="https://skillbuilder.aws/">AWS Skill Builder</a></div>';
+    html += '<div class="method"><b>After each lesson, write 3 lines:</b> Attack (what the attacker does) · Defense (how you stop it) · In my world (AWS or your stack).</div></section>';
+
+    WEEKS.forEach(function (w) {
+      var wd = w.items.filter(function (it) { return state.done[it[0]]; }).length;
+      var wp = Math.round(wd / w.items.length * 100);
+      html += '<section class="week' + (w.optional ? ' optional' : '') + '" aria-labelledby="h-' + w.id + '"><div class="week-head"><div class="week-top"><div><div class="week-label">' + esc(w.label) + '</div><h2 id="h-' + w.id + '">' + esc(w.title) + '</h2></div>';
+      html += '<span class="count' + (wd === w.items.length ? ' full' : '') + '">' + wd + '/' + w.items.length + '</span></div>';
+      html += '<div class="bar' + (wd === w.items.length ? ' done' : '') + '"><i style="width:' + wp + '%"></i></div>';
+      html += '<p class="week-note">' + esc(w.note) + '</p></div><ul>';
+      w.items.forEach(function (it) {
+        var id = it[0], src = it[1], d = state.done[id];
+        var srcLabel = src === "THM" ? "TryHackMe" : src === "HS" ? "Hacksplaining" : src === "SB" ? "Skill Builder" : "You";
+        html += '<li><div class="row' + (d ? ' is-done' : '') + '" role="checkbox" tabindex="0" aria-checked="' + (d ? 'true' : 'false') + '" data-id="' + id + '">';
+        html += '<span class="box">' + check + '</span><span class="txt"><span class="title-line"><span class="src' + (src === "You" ? ' you' : '') + '">' + srcLabel + '</span>';
+        if (it[4] === true) html += '<span class="pill-key">Interview favorite</span>';
+        else if (it[4] === "must") html += '<span class="pill-must">Must</span>';
+        else if (it[4] === "later") html += '<span class="pill-later">Later</span>';
+        html += '</span><span class="title">' + esc(it[2]) + '</span><span class="tag">' + esc(it[3]) + '</span>';
+        if (d) html += '<span class="when">Done ' + fmtDate(d) + '</span>';
+        html += '</span></div></li>';
+      });
+      html += '</ul></section>';
+    });
+
+    html += '<div class="foot"><span class="status" id="status">' + esc(statusText) + '</span>';
+    html += '<span><button type="button" id="reset"' + (confirmOn ? ' hidden' : '') + '>Reset progress</button>';
+    html += '<span class="confirm' + (confirmOn ? ' on' : '') + '"><span>Clear all ticks?</span><button type="button" class="danger" id="reset-yes">Yes, clear</button><button type="button" id="reset-no">Cancel</button></span></span></div>';
+
+    document.getElementById("root").innerHTML = html;
+  }
+
+  function setStatus(t) { statusText = t; var el = document.getElementById("status"); if (el) el.textContent = t; }
+
+  function buildDoc() {
+    var css = document.getElementById("css").textContent;
+    var app = document.getElementById("app").textContent;
+    var json = JSON.stringify(state).replace(/</g, "\\u003c");
+    return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Security Basics Tracker</title>\n' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
+      '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">\n' +
+      '<style id="css">' + css + '</style>\n</head>\n<body>\n<div class="wrap" id="root"></div>\n' +
+      '<script type="application/json" id="state">' + json + '<\/script>\n<script id="app">' + app + '<\/script>\n</body>\n</html>\n';
+  }
+
+  function save() {
+    if (pending) clearTimeout(pending);
+    if (useLocal) {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(state)); setStatus("Saved on this device only"); } catch (e) { setStatus("Can't save in this view"); }
+      return;
+    }
+    if (!artifactApi) { setStatus("Saving when ready…"); pending = setTimeout(save, 1000); return; }
+    setStatus("Saving…");
+    pending = setTimeout(function () {
+      artifactApi.publish(buildDoc()).then(function () { setStatus("Saved"); }).catch(function (err) {
+        var code = (err && (err.code || err.message)) || "";
+        if (/not_granted|not_writer/.test(code)) setStatus("View only: ticks here aren't saved");
+        else if (/conflict/.test(code)) setStatus("Updated from another device");
+        else setStatus("Couldn't save. Check your connection and tick again.");
+      });
+    }, 1200);
+  }
+
+  function toggle(id) {
+    if (state.done[id]) delete state.done[id]; else state.done[id] = new Date().toISOString();
+    render(); save();
+  }
+
+  document.getElementById("root").addEventListener("click", function (e) {
+    var row = e.target.closest(".row");
+    if (row) { toggle(row.getAttribute("data-id")); return; }
+    if (e.target.id === "reset") { confirmOn = true; render(); return; }
+    if (e.target.id === "reset-no") { confirmOn = false; render(); return; }
+    if (e.target.id === "reset-yes") { confirmOn = false; state.done = {}; render(); save(); }
+  });
+  document.getElementById("root").addEventListener("keydown", function (e) {
+    var row = e.target.closest && e.target.closest(".row");
+    if (row && (e.key === " " || e.key === "Enter")) { e.preventDefault(); var id = row.getAttribute("data-id"); toggle(id); var again = document.querySelector('.row[data-id="' + id + '"]'); if (again) again.focus(); }
+  });
+
+  render();
+
+  var use = window.claude && window.claude.use;
+  if (typeof use === "function") {
+    window.claude.use("artifact").then(function (api) {
+      if (api) { artifactApi = api; setStatus("Progress syncs across your devices"); }
+      else { fallbackLocal(); }
+    }).catch(fallbackLocal);
+  } else { fallbackLocal(); }
+
+  function fallbackLocal() {
+    useLocal = true;
+    try { var s = localStorage.getItem(LS_KEY); if (s) { var p = JSON.parse(s); if (p && p.done) state = p; } } catch (e) {}
+    statusText = "Saved on this device only";
+    render();
+  }
+})();
+</script>
+</body>
+</html>
