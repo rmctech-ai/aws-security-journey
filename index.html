@@ -178,11 +178,12 @@ li:last-child .row { border-bottom: 0; }
         ["w5b", "You", "Explain the OWASP Top 10 basics in your own words", "Use your GitHub notes"],
         ["w5c", "You", "Start the Secure AWS Account Baseline project", "Root MFA, least-privilege IAM, CloudTrail, budget alert"]
       ] },
-    { id: "later", label: "Later", title: "After you land a cloud role", optional: true,
-      note: "Advanced plans, flagged for later. Not counted in your progress.",
+    { id: "later", label: "Later", title: "Deeper security career, after you land a cloud role", optional: true,
+      note: "Flagged for later. Not counted in your progress.",
       items: [
         ["la", "SB", "Infrastructure Security Learning Plan", "10h 42m · Advanced · networking, compute, Systems Manager patching", "later"],
-        ["lb", "SB", "Security Learning Plan: Compliance", "14h 30m · Advanced · the GRC engineering path", "later"]
+        ["lb", "SB", "Security Learning Plan: Compliance", "14h 30m · Advanced · the GRC engineering path", "later"],
+        ["lc", "CO", "Google Cybersecurity Professional Certificate", "9 courses · Beginner · about 6 months at 7 hours a week · SIEM, Linux, SQL, Python · paid after the 7-day trial", "later"]
       ] }
   ];
 
@@ -222,7 +223,7 @@ li:last-child .row { border-bottom: 0; }
       html += '<p class="week-note">' + esc(w.note) + '</p></div><ul>';
       w.items.forEach(function (it) {
         var id = it[0], src = it[1], d = state.done[id];
-        var srcLabel = src === "THM" ? "TryHackMe" : src === "HS" ? "Hacksplaining" : src === "SB" ? "Skill Builder" : "You";
+        var srcLabel = src === "THM" ? "TryHackMe" : src === "HS" ? "Hacksplaining" : src === "SB" ? "Skill Builder" : src === "CO" ? "Coursera" : "You";
         html += '<li><div class="row' + (d ? ' is-done' : '') + '" role="checkbox" tabindex="0" aria-checked="' + (d ? 'true' : 'false') + '" data-id="' + id + '">';
         html += '<span class="box">' + check + '</span><span class="txt"><span class="title-line"><span class="src' + (src === "You" ? ' you' : '') + '">' + srcLabel + '</span>';
         if (it[4] === true) html += '<span class="pill-key">Interview favorite</span>';

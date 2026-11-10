@@ -15,6 +15,14 @@ My path from AWS Cloud Practitioner into cloud security: AWS Skill Builder secur
 | 3 | Hacksplaining: 24 lessons on web, API and LLM security | Planned |
 | 4 | Project: Secure AWS Account Baseline | Planned |
 
+### Later: deeper security career
+
+| What | Notes |
+|---|---|
+| AWS Skill Builder: Infrastructure Security learning plan | Advanced |
+| AWS Skill Builder: Security Learning Plan: Compliance | Advanced, GRC engineering |
+| [Google Cybersecurity Professional Certificate](https://www.coursera.org/google-certificates/cybersecurity-certificate) (Coursera) | 9 courses, about 6 months at 7 hours a week. SIEM, Linux, SQL, Python |
+
 ## Badges and certificates
 
 *Coming soon.*
