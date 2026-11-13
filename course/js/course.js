@@ -6,7 +6,7 @@ window.COURSE = {
  "where": "SHELL",
  "lab": "python",
  "handsOn": "Defense Lab challenge",
- "errRe": "Traceback|INJECTION|AccessDenied|Failed password|error occurred|Error:|BLOCKED|False$",
+ "errRe": "Traceback|⚠ INJECTION|AccessDenied|Failed password|error occurred|Error:|BLOCKED|False$",
  "cats": [
   [
    "all",
