@@ -4,6 +4,10 @@ My path from AWS Cloud Practitioner into cloud security: AWS Skill Builder secur
 
 **Live tracker:** https://rmctech-ai.github.io/aws-security-journey/
 
+**Interactive course:** 🧭 [Security Journey Explorer](https://rmctech-ai.github.io/aws-security-journey/course/): 15 lessons that follow this roadmap (foundations, AWS security, web/API/LLM attacks, GRC) in the Attack · Defense · In my world format, with a Python Defense Lab. Source in [`course/`](course/).
+
+> 🏠 Part of **[Raul's Cloud Learning Hub](https://rmctech-ai.github.io/)**.
+
 ## Roadmap
 
 | Step | What | Status |

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>(function(){var t="dark";try{t=localStorage.getItem("rmc-theme")||"dark"}catch(e){}document.documentElement.dataset.theme=t;})();</script>
 <style id="css">
 :root {
   /* Layout: single phone-first column; summary bar, then week cards with tappable rows */
@@ -211,7 +212,7 @@ li:last-child .row { border-bottom: 0; }
     var html = '<header><h1>Security Basics Tracker</h1><p class="sub">TryHackMe Pre Security, 24 Hacksplaining lessons and AWS Skill Builder security plans</p></header>';
     html += '<section class="summary" aria-label="Overall progress"><div class="big"><strong>' + pct + '%</strong><span>' + done + ' of ' + total + ' done</span></div>';
     html += '<div class="bar' + (done === total ? ' done' : '') + '"><i style="width:' + pct + '%"></i></div>';
-    html += '<div class="links"><a href="https://tryhackme.com/path/outline/presecurity">TryHackMe Pre Security</a><a href="https://www.hacksplaining.com/app/lessons">Hacksplaining lessons</a><a href="https://skillbuilder.aws/">AWS Skill Builder</a></div>';
+    html += '<div class="links"><a href="https://tryhackme.com/path/outline/presecurity">TryHackMe Pre Security</a><a href="https://www.hacksplaining.com/app/lessons">Hacksplaining lessons</a><a href="https://skillbuilder.aws/">AWS Skill Builder</a><a href="course/">🧭 Security Journey course</a><a href="https://rmctech-ai.github.io/">☁ Cloud Learning Hub</a></div>';
     html += '<div class="method"><b>After each lesson, write 3 lines:</b> Attack (what the attacker does) · Defense (how you stop it) · In my world (AWS or your stack).</div></section>';
 
     WEEKS.forEach(function (w) {
